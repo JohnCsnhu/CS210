@@ -1,0 +1,129 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <map>
+#include <iomanip>
+
+using namespace std;
+
+// Class to handle item tracking and frequency operations
+class ItemTracker {
+private:
+    map<string, int> itemFrequencies; // Store item frequencies
+    string inputFileName = "CS210_Project_Three_Input_File.txt"; // Input file name
+    string outputFileName = "frequency.dat"; // Output file name for backup
+
+public:
+    // Constructor to initialize the item frequencies by reading the input file
+    ItemTracker() {
+        loadItemsFromFile();
+    }
+
+    // Method to load items and their frequencies from the file
+    void loadItemsFromFile() {
+        ifstream inputFile(inputFileName);
+        string item;
+
+        if (!inputFile) {
+            cout << "Error opening file!" << endl;
+            return;
+        }
+
+        while (getline(inputFile, item)) {
+            itemFrequencies[item]++;
+        }
+
+        inputFile.close();
+    }
+
+    // Method to search for a specific item and return its frequency
+    void searchItemFrequency() {
+        string item;
+        cout << "Enter the item you wish to search for: ";
+        cin >> item;
+
+        auto it = itemFrequencies.find(item);
+        if (it != itemFrequencies.end()) {
+            cout << item << " was purchased " << it->second << " times." << endl;
+        }
+        else {
+            cout << item << " was not found in the records." << endl;
+        }
+    }
+
+    // Method to display all item frequencies
+    void displayItemFrequencies() {
+        cout << "Item Frequencies:" << endl;
+        for (const auto& pair : itemFrequencies) {
+            cout << pair.first << " " << pair.second << endl;
+        }
+    }
+
+    // Method to display a histogram of item frequencies
+    void displayItemHistogram() {
+        cout << "Item Frequency Histogram:" << endl;
+        for (const auto& pair : itemFrequencies) {
+            cout << pair.first << " ";
+            for (int i = 0; i < pair.second; ++i) {
+                cout << "*";
+            }
+            cout << endl;
+        }
+    }
+
+    // Method to save the frequencies to a backup file
+    void saveFrequenciesToFile() {
+        ofstream outputFile(outputFileName);
+
+        if (!outputFile) {
+            cout << "Error opening file for writing!" << endl;
+            return;
+        }
+
+        for (const auto& pair : itemFrequencies) {
+            outputFile << pair.first << " " << pair.second << endl;
+        }
+
+        outputFile.close();
+        cout << "Data saved to " << outputFileName << endl;
+    }
+};
+
+// Function to display the menu and get user input
+void displayMenu() {
+    cout << "1. Search for an item" << endl;
+    cout << "2. Display item frequencies" << endl;
+    cout << "3. Display item frequency histogram" << endl;
+    cout << "4. Exit" << endl;
+    cout << "Enter your choice: ";
+}
+
+int main() {
+    ItemTracker tracker; // Create an ItemTracker object
+
+    int choice;
+    do {
+        displayMenu(); // Display menu options
+        cin >> choice; // Get user choice
+
+        switch (choice) {
+        case 1:
+            tracker.searchItemFrequency(); // Search for an item
+            break;
+        case 2:
+            tracker.displayItemFrequencies(); // Display item frequencies
+            break;
+        case 3:
+            tracker.displayItemHistogram(); // Display item histogram
+            break;
+        case 4:
+            tracker.saveFrequenciesToFile(); // Save frequencies to backup file
+            cout << "Exiting program." << endl;
+            break;
+        default:
+            cout << "Invalid choice, please try again." << endl;
+        }
+    } while (choice != 4); // Loop until the user chooses to exit
+
+    return 0;
+}
